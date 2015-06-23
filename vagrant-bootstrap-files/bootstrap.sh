@@ -265,6 +265,6 @@ fi
 
 # netz98 magerun CLI tools
 
-wget http://files.magerun.net/n98-magerun-latest.phar -O n98-magerun.phar
-mv n98-magerun.phar /usr/local/bin/n98-magerun.phar
+wget -q --no-check-certificate https://raw.github.com/netz98/n98-magerun/master/n98-magerun.phar
+mv n98-magerun.phar /usr/local/bin/
 chmod +x /usr/local/bin/n98-magerun.phar
