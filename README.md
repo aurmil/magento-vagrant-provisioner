@@ -24,7 +24,7 @@ Tools
 * Vim
 * Git
 * [Composer](https://getcomposer.org/)
-* phpMyAdmin
+* [Adminer](http://www.adminer.org/)
 * phpinfo script
 * [OpCache GUI script](https://github.com/amnuts/opcache-gui)
 
@@ -50,7 +50,7 @@ See the [Vagrant official docs for `vagrant up / ssh / halt / destroy` commands]
 Within a web browser, you can access:
 * Magento front office `http://127.0.0.1:8080/`
 * Magento back office `http://127.0.0.1:8080/admin/`, credentials are: `admin` / `magento1`  (unless you customized these datas)
-* phpMyAdmin `http://127.0.0.1:8080/phpmyadmin/`
+* Adminer `http://127.0.0.1:8080/adminer.php`
 * phpinfo script `http://127.0.0.1:8080/info.php`
 * OpCache GUI script `http://127.0.0.1:8080/opcache.php`
 
@@ -61,7 +61,6 @@ Application files are located in `your-project-folder/www`, you can manage them 
 Some variables are located in a dedicated file `vagrant-bootstrap-files/bootstrap.cfg` so they can be easily changed:
 
 * MySQL root user password
-* MySQL phpMyAdmin user password
 * MySQL Magento database name, user name and password
 * Install Magento sample data or not (default = yes)
 * System and Magento time zone (default = Europe/Paris)

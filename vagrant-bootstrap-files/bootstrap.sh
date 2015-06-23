@@ -52,18 +52,6 @@ debconf-set-selections <<< "mysql-server mysql-server/root_password_again passwo
 
 apt-get install -q -y mysql-server-5.5
 
-# phpmyadmin
-
-debconf-set-selections <<< "phpmyadmin phpmyadmin/reconfigure-webserver multiselect apache2"
-debconf-set-selections <<< "phpmyadmin phpmyadmin/dbconfig-install boolean true"
-debconf-set-selections <<< "phpmyadmin phpmyadmin/mysql/admin-pass password $MYSQL_ROOT_USER_PASSWORD"
-debconf-set-selections <<< "phpmyadmin phpmyadmin/mysql/app-pass password $MYSQL_PHPMYADMIN_USER_PASSWORD"
-debconf-set-selections <<< "phpmyadmin phpmyadmin/app-password-confirm password $MYSQL_PHPMYADMIN_USER_PASSWORD"
-
-apt-get -q -y install phpmyadmin
-
-service apache2 reload
-
 # sync vagrant folder with apache root folder
 
 dir='/vagrant/www'
@@ -95,6 +83,15 @@ file='opcache.php'
 
 if [ ! -f "$file" ]; then
   wget -q --output-document "$file" https://raw.githubusercontent.com/amnuts/opcache-gui/master/index.php
+fi
+
+# adminer script
+
+file='adminer.php'
+
+if [ ! -f "$file" ]; then
+  wget -q --output-document "$file" http://www.adminer.org/latest.php
+  wget -q https://raw.githubusercontent.com/vrana/adminer/master/designs/pepa-linha/adminer.css
 fi
 
 # git
