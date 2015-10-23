@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# read config file
+# configuration
 
 file='/vagrant/vagrant-bootstrap-files/bootstrap.cfg'
 file_secured='/tmp/bootstrap.cfg'
@@ -12,45 +12,46 @@ fi
 
 . "$file"
 
+MAGENTO_VERSION='1.9.2.1'
+MAGENTO_SAMPLE_DATA_VERSION='1.9.1.0'
+
+MYSQL_MAGENTO_DB_NAME='magento1'
+MYSQL_MAGENTO_USER_NAME='magento1'
+MYSQL_MAGENTO_USER_PASSWORD='magento1'
+
+MAGENTO_URL='http://127.0.0.1:8080/'
+
+MAGENTO_ADMIN_PATH='admin'
+MAGENTO_ADMIN_USER_NAME='admin'
+MAGENTO_ADMIN_USER_PASSWORD='magento1'
+
 # disable queries for user manual interactions
 
 export DEBIAN_FRONTEND=noninteractive
+
+# update time zone
+
+echo "$TIME_ZONE" > /etc/timezone
+dpkg-reconfigure -f noninteractive tzdata
 
 # update packages
 
 apt-get update -q
 
-# update time zone
-
-echo "$TIME_ZONE" > /etc/timezone
-
-dpkg-reconfigure -f noninteractive tzdata
-
 # vim
 
 apt-get install -q -y vim
+
+# git
+
+apt-get install -q -y git
 
 # apache
 
 apt-get install -q -y apache2
 apt-get install -q -y apache2.2-common
-
 a2enmod rewrite headers
-
-# php
-
-apt-get install -q -y php5
-apt-get install -q -y libapache2-mod-php5
-apt-get install -q -y php5-curl php5-gd php5-mcrypt php5-mysqlnd php-soap php5-xdebug
-
 service apache2 restart
-
-# mysql
-
-debconf-set-selections <<< "mysql-server mysql-server/root_password password $MYSQL_ROOT_USER_PASSWORD"
-debconf-set-selections <<< "mysql-server mysql-server/root_password_again password $MYSQL_ROOT_USER_PASSWORD"
-
-apt-get install -q -y mysql-server-5.5
 
 # sync vagrant folder with apache root folder
 
@@ -69,9 +70,22 @@ fi
 
 cd "$dir"
 
+# php
+
+apt-get install -q -y php5
+apt-get install -q -y libapache2-mod-php5
+apt-get install -q -y php5-curl php5-gd php5-mcrypt php5-mysqlnd php-soap php5-xdebug
+service apache2 restart
+
+# composer
+
+php -r "readfile('https://getcomposer.org/installer');" | php
+mv composer.phar /usr/local/bin/composer
+chmod +x /usr/local/bin/composer
+
 # phpinfo script
 
-file='info.php'
+file='phpinfo.php'
 
 if [ ! -f "$file" ]; then
   echo '<?php phpinfo();' > "$file"
@@ -82,49 +96,30 @@ fi
 file='opcache.php'
 
 if [ ! -f "$file" ]; then
-  wget -q --output-document "$file" https://raw.githubusercontent.com/amnuts/opcache-gui/master/index.php
+  wget -nv -O "$file" https://raw.githubusercontent.com/amnuts/opcache-gui/master/index.php
 fi
+
+# mysql
+
+apt-get install -q -y mysql-server-5.5
 
 # adminer script
 
 file='adminer.php'
 
 if [ ! -f "$file" ]; then
-  wget -q --output-document "$file" http://www.adminer.org/latest.php
-  wget -q https://raw.githubusercontent.com/vrana/adminer/master/designs/pepa-linha/adminer.css
+  wget -nv -O "$file" http://www.adminer.org/latest.php
+  wget -nv https://raw.githubusercontent.com/vrana/adminer/master/designs/pepa-linha/adminer.css
 fi
 
-# git
+# magento mysql user and database
 
-apt-get install -q -y git
+mysql -u root -e "CREATE DATABASE IF NOT EXISTS $MYSQL_MAGENTO_DB_NAME DEFAULT CHARACTER SET 'utf8' DEFAULT COLLATE 'utf8_general_ci'"
+mysql -u root -e "CREATE USER '$MYSQL_MAGENTO_USER_NAME'@'localhost' IDENTIFIED BY '$MYSQL_MAGENTO_USER_PASSWORD'"
+mysql -u root -e "GRANT ALL ON $MYSQL_MAGENTO_DB_NAME.* TO '$MYSQL_MAGENTO_USER_NAME'@'localhost'"
+mysql -u root -e "FLUSH PRIVILEGES"
 
-# composer
-
-php -r "readfile('https://getcomposer.org/installer');" | php
-mv composer.phar /usr/local/bin/composer
-chmod +x /usr/local/bin/composer
-
-# modman
-
-bash < <(wget -q --no-check-certificate -O - https://raw.github.com/colinmollenhour/modman/master/modman-installer)
-mv /root/bin/modman /usr/local/bin/modman
-chmod +x /usr/local/bin/modman
-
-if [ ! -d .modman ]; then
-  modman init
-fi
-
-# modgit
-
-wget -q -O modgit https://raw.github.com/jreinke/modgit/master/modgit
-mv modgit /usr/local/bin/modgit
-chmod +x /usr/local/bin/modgit
-
-if [ ! -d .modgit ]; then
-  modgit init
-fi
-
-# magento apache config
+# magento vhost
 
 SITE_CONF=$(cat <<EOF
 <Directory /var/www/html>
@@ -137,83 +132,47 @@ SITE_CONF=$(cat <<EOF
 EOF
 )
 
-echo "$SITE_CONF" > /etc/apache2/sites-available/magento.conf
-
-a2ensite magento
-
+echo "$SITE_CONF" > /etc/apache2/sites-available/magento1.conf
+a2ensite magento1
 service apache2 reload
-
-# magento mysql user and database
-
-mysql -u root -p"$MYSQL_ROOT_USER_PASSWORD" -e "CREATE DATABASE IF NOT EXISTS $MYSQL_MAGENTO_DB_NAME DEFAULT CHARACTER SET 'utf8' DEFAULT COLLATE 'utf8_general_ci'"
-mysql -u root -p"$MYSQL_ROOT_USER_PASSWORD" -e "CREATE USER '$MYSQL_MAGENTO_USER_NAME'@'localhost' IDENTIFIED BY '$MYSQL_MAGENTO_USER_PASSWORD'"
-mysql -u root -p"$MYSQL_ROOT_USER_PASSWORD" -e "GRANT ALL ON $MYSQL_MAGENTO_DB_NAME.* TO '$MYSQL_MAGENTO_USER_NAME'@'localhost'"
-mysql -u root -p"$MYSQL_ROOT_USER_PASSWORD" -e "FLUSH PRIVILEGES"
 
 # magento files
 
-MAGENTO_VERSION='1.9.1.1'
-MAGENTO_SAMPLE_DATA_VERSION='1.9.1.0'
-
 if [ ! -f app/etc/config.xml ]; then
 
-  # magento
+  # files
 
-  dir='magento'
+  dir="magento-mirror-$MAGENTO_VERSION"
+  file="magento-$MAGENTO_VERSION.tar.gz"
 
   if [ -d "$dir" ]; then
     rm -rf "$dir"
   fi
 
-  file="magento-$MAGENTO_VERSION.tar.gz"
-  
   if [ ! -f "$file" ]; then
-    if [ -f /vagrant/vagrant-bootstrap-files/"$file" ]; then
-      cp /vagrant/vagrant-bootstrap-files/"$file" .
-    else
-      wget "http://www.magentocommerce.com/downloads/assets/$MAGENTO_VERSION/$file"
-    fi
+    wget -nv -O "$file" "https://github.com/OpenMage/magento-mirror/archive/$MAGENTO_VERSION.tar.gz"
   fi
 
-  tar -zxvf "$file"
+  tar -zxf "$file"
+  mv "$dir"/* "$dir"/.htaccess* .
+  rm -rf "$dir"
 
-  mv magento/* magento/.htaccess* .
-
-  rmdir "$dir"
-  
-  # magento patches
-  
-  file="PATCH_SUPEE-5994_CE_1.6.0.0_v1-2015-05-15-04-34-46.sh"
-
-  if [ -f /vagrant/vagrant-bootstrap-files/"$file" ]; then
-    cp /vagrant/vagrant-bootstrap-files/"$file" .
-    sh "$file"
-  fi
-
-  file="PATCH_SUPEE-6237_EE_1.14.2.0_v1-2015-06-18-05-24-23.sh"
-
-  if [ -f /vagrant/vagrant-bootstrap-files/"$file" ]; then
-    cp /vagrant/vagrant-bootstrap-files/"$file" .
-    sh "$file"
-  fi
-  
-  # magento channels
+  # channels
 
   ./mage mage-setup
 
-  # magento sample data
+  # sample data
 
   if [ "$MAGENTO_INSTALL_SAMPLE_DATA" = true ]; then
-  
+
     # files
-  
+
     dir="magento-sample-data-$MAGENTO_SAMPLE_DATA_VERSION"
+    file="$dir.tar.gz"
 
     if [ -d "$dir" ]; then
       rm -rf "$dir"
     fi
-
-    file="magento-sample-data-$MAGENTO_SAMPLE_DATA_VERSION.tar.gz"
 
     if [ ! -f "$file" ]; then
       if [ -f /vagrant/vagrant-bootstrap-files/"$file" ]; then
@@ -223,25 +182,22 @@ if [ ! -f app/etc/config.xml ]; then
       fi
     fi
 
-    tar -zxvf "$file"
-  
+    tar -zxf "$file"
     cp -R "$dir"/media/* ./media/
     cp -R "$dir"/skin/* ./skin/
-	
-	# database
-  
+
+    # database
+
     mysql -u "$MYSQL_MAGENTO_USER_NAME" -p"$MYSQL_MAGENTO_USER_PASSWORD" "$MYSQL_MAGENTO_DB_NAME" < "$dir/magento_sample_data_for_$MAGENTO_SAMPLE_DATA_VERSION.sql"
-	
+
     rm -rf "$dir"
-	
-	# language packs
-	
+
+    # language packs
+
     ./mage install http://connect20.magentocommerce.com/community/ Locale_Mage_community_fr_FR
     ./mage install http://connect20.magentocommerce.com/community/ Locale_Mage_community_de_DE
   fi
 fi
-
-# magento permissions
 
 chmod -R o+w media var
 chmod o+w var var/.htaccess app/etc
@@ -253,7 +209,7 @@ if [ ! -f app/etc/local.xml ]; then
   --license_agreement_accepted 'yes' \
   --locale "$MAGENTO_LOCALE" --timezone "$TIME_ZONE" --default_currency "$MAGENTO_CURRENCY" \
   --db_model 'mysql4' --db_host 'localhost' --db_name "$MYSQL_MAGENTO_DB_NAME" --db_user "$MYSQL_MAGENTO_USER_NAME" --db_pass "$MYSQL_MAGENTO_USER_PASSWORD" \
-  --url 'http://127.0.0.1:8080/' --admin_frontname "$MAGENTO_ADMIN_PATH" --enable_charts 'yes' --skip_url_validation 'yes' --use_rewrites 'yes' --use_secure 'no' --secure_base_url 'http://127.0.0.1:8080/' --use_secure_admin 'no' \
+  --url "$MAGENTO_URL" --admin_frontname "$MAGENTO_ADMIN_PATH" --enable_charts 'yes' --skip_url_validation 'yes' --use_rewrites 'yes' --use_secure 'no' --secure_base_url "$MAGENTO_URL" --use_secure_admin 'no' \
   --session_save 'files' \
   --admin_firstname 'Store' --admin_lastname 'Owner' --admin_email 'admin@example.com' \
   --admin_username "$MAGENTO_ADMIN_USER_NAME" --admin_password "$MAGENTO_ADMIN_USER_PASSWORD"
@@ -263,8 +219,28 @@ fi
 
 /usr/bin/php -f shell/indexer.php reindexall
 
+# modman
+
+bash < <(wget -nv --no-check-certificate -O - https://raw.github.com/colinmollenhour/modman/master/modman-installer)
+mv /root/bin/modman /usr/local/bin/modman
+chmod +x /usr/local/bin/modman
+
+if [ ! -d .modman ]; then
+  modman init
+fi
+
+# modgit
+
+wget -nv -O modgit https://raw.github.com/jreinke/modgit/master/modgit
+mv modgit /usr/local/bin/modgit
+chmod +x /usr/local/bin/modgit
+
+if [ ! -d .modgit ]; then
+  modgit init
+fi
+
 # netz98 magerun CLI tools
 
-wget -q --no-check-certificate https://raw.github.com/netz98/n98-magerun/master/n98-magerun.phar
+wget -nv --no-check-certificate https://raw.github.com/netz98/n98-magerun/master/n98-magerun.phar
 mv n98-magerun.phar /usr/local/bin/
 chmod +x /usr/local/bin/n98-magerun.phar

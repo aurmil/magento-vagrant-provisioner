@@ -13,20 +13,20 @@ LAMP
 
 Magento
 
-* Magento CE 1.9.1.1 (with patches SUPEE-5994 and SUPEE-6237)
+* Magento CE 1.9.2.1 (from [OpenMage GitHub repo](https://github.com/OpenMage/magento-mirror) as Magento official website requires user to be logged in to download the archive)
 * Magento Sample Data 1.9.1.0 (optional ; with [French](http://www.magentocommerce.com/magento-connect/french-france-language-pack-for-magento-traduction-francaise.html) and [German](http://www.magentocommerce.com/magento-connect/locale-mage-community-de-de.html) language packs)
-* [netz98 magerun CLI tools](https://github.com/netz98/n98-magerun)
 * [modman](https://github.com/colinmollenhour/modman)
 * [modgit](https://github.com/jreinke/modgit)
+* [netz98 magerun CLI tools](https://github.com/netz98/n98-magerun)
 
 Tools
 
 * Vim
 * Git
 * [Composer](https://getcomposer.org/)
-* [Adminer](http://www.adminer.org/)
 * phpinfo script
 * [OpCache GUI script](https://github.com/amnuts/opcache-gui)
+* [Adminer](http://www.adminer.org/)
 
 ## Requirements
 
@@ -39,9 +39,9 @@ Tools
 * [Download](https://github.com/aurmil/magento-vagrant-provisioner/archive/master.zip) or clone this repository into your project's folder
 * Run `vagrant up` in this folder
 
-__Note:__
+__Note on sample data:__
 
-To speed up the environment installation (first `vagrant up`), you can download Magento and sample data (if you want to install it) in .tar.gz format [from the official site](https://www.magentocommerce.com/download) and put `magento-1.9.1.1.tar.gz` and `magento-sample-data-1.9.1.0.tar.gz` files in the `vagrant-bootstrap-files` folder. Doing so will avoid downloading them from within the virtual machine.
+If you want to install the sample data, you can speed up the environment installation (first `vagrant up`) by downloading on your own the 430 MB archive in .tar.gz format from [Magento website](https://www.magentocommerce.com/download) then just put `magento-sample-data-1.x.y.z.tar.gz` file in the `vagrant-bootstrap-files` folder.
 
 ## Usage
 
@@ -49,9 +49,9 @@ See the [Vagrant official docs for `vagrant up / ssh / halt / destroy` commands]
 
 Within a web browser, you can access:
 * Magento front office `http://127.0.0.1:8080/`
-* Magento back office `http://127.0.0.1:8080/admin/`, credentials are: `admin` / `magento1`  (unless you customized these datas)
-* Adminer `http://127.0.0.1:8080/adminer.php`
-* phpinfo script `http://127.0.0.1:8080/info.php`
+* Magento back office `http://127.0.0.1:8080/admin/`, credentials are: `admin` / `magento1`
+* Adminer `http://127.0.0.1:8080/adminer.php`, credentials are: `magento1` / `magento1` or `root` / nothing
+* phpinfo script `http://127.0.0.1:8080/phpinfo.php`
 * OpCache GUI script `http://127.0.0.1:8080/opcache.php`
 
 Application files are located in `your-project-folder/www`, you can manage them directly from your host machine.
@@ -60,10 +60,7 @@ Application files are located in `your-project-folder/www`, you can manage them 
 
 Some variables are located in a dedicated file `vagrant-bootstrap-files/bootstrap.cfg` so they can be easily changed:
 
-* MySQL root user password
-* MySQL Magento database name, user name and password
-* Install Magento sample data or not (default = yes)
 * System and Magento time zone (default = Europe/Paris)
+* Install Magento sample data or not (default = yes)
 * Magento locale (default = English)
 * Magento currency (default = Euro)
-* Magento admin path (default = admin), login (default = admin) and password (default = magento1)
