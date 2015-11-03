@@ -13,7 +13,7 @@ LAMP
 
 Magento
 
-* Magento CE 1.9.2.1 (from [OpenMage GitHub repo](https://github.com/OpenMage/magento-mirror) as Magento official website requires user to be logged in to download the archive)
+* Magento CE 1.9.2.2 (from [OpenMage GitHub repo](https://github.com/OpenMage/magento-mirror) as Magento official website requires user to be logged in to download the archive)
 * Magento Sample Data 1.9.1.0 (optional ; with [French](http://www.magentocommerce.com/magento-connect/french-france-language-pack-for-magento-traduction-francaise.html) and [German](http://www.magentocommerce.com/magento-connect/locale-mage-community-de-de.html) language packs)
 * [modman](https://github.com/colinmollenhour/modman)
 * [modgit](https://github.com/jreinke/modgit)
