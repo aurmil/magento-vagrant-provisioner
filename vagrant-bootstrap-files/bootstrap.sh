@@ -12,7 +12,7 @@ fi
 
 . "$file"
 
-MAGENTO_VERSION='1.9.2.2'
+MAGENTO_VERSION='1.9.2.4'
 MAGENTO_SAMPLE_DATA_VERSION='1.9.1.0' # only version supported!
 
 MYSQL_MAGENTO_DB_NAME='magento1'
@@ -137,28 +137,28 @@ a2ensite magento1
 service apache2 reload
 
 # magento files
-
 if [ ! -f app/etc/config.xml ]; then
-
-  # files
-
   dir="magento-mirror-$MAGENTO_VERSION"
   file="magento-$MAGENTO_VERSION.tar.gz"
 
+  # if folder already exists, remove it
   if [ -d "$dir" ]; then
     rm -rf "$dir"
   fi
 
+  # if file does not exist, download it
   if [ ! -f "$file" ]; then
     wget -nv -O "$file" "https://github.com/OpenMage/magento-mirror/archive/$MAGENTO_VERSION.tar.gz"
   fi
 
-  tar -zxf "$file"
-  mv "$dir"/* "$dir"/.htaccess* .
-  rm -rf "$dir"
+  # if file exists, extract content
+  if [ -f "$file" ]; then
+    tar -zxf "$file"
+    mv "$dir"/* "$dir"/.htaccess* .
+    rm -rf "$dir"
+  fi
 
-  # channels
-
+  # init channels
   ./mage mage-setup
 
   # install sample data if needed
