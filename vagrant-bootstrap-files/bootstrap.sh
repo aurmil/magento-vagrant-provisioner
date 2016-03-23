@@ -158,8 +158,8 @@ if [ ! -f app/etc/config.xml ]; then
     # if file exists, extract content and install sample data
     if [ -f "$file" ]; then
       tar -zxf "$file"
-      mv "$dir"/media/* ./media/
-      mv "$dir"/skin/* ./skin/
+      cp -R "$dir"/media/* ./media/
+      cp -R "$dir"/skin/* ./skin/
       mysql -u "$MYSQL_MAGENTO_USER_NAME" -p"$MYSQL_MAGENTO_USER_PASSWORD" "$MYSQL_MAGENTO_DB_NAME" < "$dir/magento_sample_data_for_$MAGENTO_SAMPLE_DATA_VERSION.sql"
       rm -rf "$dir"
     fi
