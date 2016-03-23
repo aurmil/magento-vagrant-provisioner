@@ -13,7 +13,7 @@ fi
 . "$file"
 
 MAGENTO_VERSION='1.9.2.2'
-MAGENTO_SAMPLE_DATA_VERSION='1.9.1.0'
+MAGENTO_SAMPLE_DATA_VERSION='1.9.1.0' # only version supported!
 
 MYSQL_MAGENTO_DB_NAME='magento1'
 MYSQL_MAGENTO_USER_NAME='magento1'
@@ -161,39 +161,35 @@ if [ ! -f app/etc/config.xml ]; then
 
   ./mage mage-setup
 
-  # sample data
-
+  # install sample data if needed
   if [ "$MAGENTO_INSTALL_SAMPLE_DATA" = true ]; then
-
-    # files
-
     dir="magento-sample-data-$MAGENTO_SAMPLE_DATA_VERSION"
     file="$dir.tar.gz"
 
+    # if folder already exists, remove it
     if [ -d "$dir" ]; then
       rm -rf "$dir"
     fi
 
+    # if file does not exist, search it elsewhere or download it
     if [ ! -f "$file" ]; then
       if [ -f /vagrant/vagrant-bootstrap-files/"$file" ]; then
         cp /vagrant/vagrant-bootstrap-files/"$file" .
       else
-        wget "http://www.magentocommerce.com/downloads/assets/$MAGENTO_SAMPLE_DATA_VERSION/$file"
+        wget -nv -O "$file" "https://raw.githubusercontent.com/Vinai/compressed-magento-sample-data/$MAGENTO_SAMPLE_DATA_VERSION/compressed-$dir.tgz"
       fi
     fi
 
-    tar -zxf "$file"
-    cp -R "$dir"/media/* ./media/
-    cp -R "$dir"/skin/* ./skin/
+    # if file exists, extract content and install sample data
+    if [ -f "$file" ]; then
+      tar -zxf "$file"
+      mv "$dir"/media/* ./media/
+      mv "$dir"/skin/* ./skin/
+      mysql -u "$MYSQL_MAGENTO_USER_NAME" -p"$MYSQL_MAGENTO_USER_PASSWORD" "$MYSQL_MAGENTO_DB_NAME" < "$dir/magento_sample_data_for_$MAGENTO_SAMPLE_DATA_VERSION.sql"
+      rm -rf "$dir"
+    fi
 
-    # database
-
-    mysql -u "$MYSQL_MAGENTO_USER_NAME" -p"$MYSQL_MAGENTO_USER_PASSWORD" "$MYSQL_MAGENTO_DB_NAME" < "$dir/magento_sample_data_for_$MAGENTO_SAMPLE_DATA_VERSION.sql"
-
-    rm -rf "$dir"
-
-    # language packs
-
+    # install language packs
     ./mage install http://connect20.magentocommerce.com/community/ Locale_Mage_community_fr_FR
     ./mage install http://connect20.magentocommerce.com/community/ Locale_Mage_community_de_DE
   fi
