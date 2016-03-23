@@ -26,101 +26,77 @@ MAGENTO_ADMIN_USER_NAME='admin'
 MAGENTO_ADMIN_USER_PASSWORD='magento1'
 
 # disable queries for user manual interactions
-
 export DEBIAN_FRONTEND=noninteractive
 
 # update time zone
-
 echo "$TIME_ZONE" > /etc/timezone
 dpkg-reconfigure -f noninteractive tzdata
 
 # update packages
-
 apt-get update -q
 
 # vim
-
 apt-get install -q -y vim
 
 # git
-
 apt-get install -q -y git
 
 # apache
-
-apt-get install -q -y apache2
-apt-get install -q -y apache2.2-common
+apt-get install -q -y apache2 apache2.2-common
 a2enmod rewrite headers
 service apache2 restart
 
 # sync vagrant folder with apache root folder
-
 dir='/vagrant/www'
-
 if [ ! -d "$dir" ]; then
   mkdir "$dir"
 fi
-
 if [ ! -L /var/www/html ]; then
   rm -rf /var/www/html
   ln -fs "$dir" /var/www/html
 fi
 
 # go to www
-
 cd "$dir"
 
 # php
-
-apt-get install -q -y php5
-apt-get install -q -y libapache2-mod-php5
-apt-get install -q -y php5-curl php5-gd php5-mcrypt php5-mysqlnd php-soap php5-xdebug
+apt-get install -q -y php5 libapache2-mod-php5 php5-curl php5-gd php5-mcrypt php5-mysqlnd php-soap php5-xdebug
 service apache2 restart
 
 # composer
-
 php -r "readfile('https://getcomposer.org/installer');" | php
 mv composer.phar /usr/local/bin/composer
 chmod +x /usr/local/bin/composer
 
 # phpinfo script
-
 file='phpinfo.php'
-
 if [ ! -f "$file" ]; then
   echo '<?php phpinfo();' > "$file"
 fi
 
 # opcache gui script
-
 file='opcache.php'
-
 if [ ! -f "$file" ]; then
   wget -nv -O "$file" https://raw.githubusercontent.com/amnuts/opcache-gui/master/index.php
 fi
 
 # mysql
-
 apt-get install -q -y mysql-server-5.5
 
 # adminer script
-
 file='adminer.php'
-
 if [ ! -f "$file" ]; then
   wget -nv -O "$file" http://www.adminer.org/latest.php
   wget -nv https://raw.githubusercontent.com/vrana/adminer/master/designs/pepa-linha/adminer.css
 fi
 
 # magento mysql user and database
-
 mysql -u root -e "CREATE DATABASE IF NOT EXISTS $MYSQL_MAGENTO_DB_NAME DEFAULT CHARACTER SET 'utf8' DEFAULT COLLATE 'utf8_general_ci'"
 mysql -u root -e "CREATE USER '$MYSQL_MAGENTO_USER_NAME'@'localhost' IDENTIFIED BY '$MYSQL_MAGENTO_USER_PASSWORD'"
 mysql -u root -e "GRANT ALL ON $MYSQL_MAGENTO_DB_NAME.* TO '$MYSQL_MAGENTO_USER_NAME'@'localhost'"
 mysql -u root -e "FLUSH PRIVILEGES"
 
 # magento vhost
-
 SITE_CONF=$(cat <<EOF
 <Directory /var/www/html>
   AllowOverride All
@@ -131,7 +107,6 @@ SITE_CONF=$(cat <<EOF
 </Directory>
 EOF
 )
-
 echo "$SITE_CONF" > /etc/apache2/sites-available/magento1.conf
 a2ensite magento1
 service apache2 reload
@@ -199,7 +174,6 @@ chmod -R o+w media var
 chmod o+w var var/.htaccess app/etc
 
 # magento install
-
 if [ ! -f app/etc/local.xml ]; then
   /usr/bin/php -f install.php -- \
   --license_agreement_accepted 'yes' \
@@ -212,31 +186,25 @@ if [ ! -f app/etc/local.xml ]; then
 fi
 
 # magento re-index
-
 /usr/bin/php -f shell/indexer.php reindexall
 
 # modman
-
 bash < <(wget -nv --no-check-certificate -O - https://raw.github.com/colinmollenhour/modman/master/modman-installer)
 mv /root/bin/modman /usr/local/bin/modman
 chmod +x /usr/local/bin/modman
-
 if [ ! -d .modman ]; then
   modman init
 fi
 
 # modgit
-
 wget -nv -O modgit https://raw.github.com/jreinke/modgit/master/modgit
 mv modgit /usr/local/bin/modgit
 chmod +x /usr/local/bin/modgit
-
 if [ ! -d .modgit ]; then
   modgit init
 fi
 
 # netz98 magerun CLI tools
-
 wget -nv --no-check-certificate https://raw.github.com/netz98/n98-magerun/master/n98-magerun.phar
 mv n98-magerun.phar /usr/local/bin/
 chmod +x /usr/local/bin/n98-magerun.phar
