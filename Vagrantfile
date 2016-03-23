@@ -13,7 +13,7 @@ Vagrant.configure("2") do |config|
 	vb.customize ["guestproperty", "set", :id, "/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold", 10000]
   end
 
-  config.vm.synced_folder ".", "/vagrant", owner: "www-data", group: "www-data"
+  config.vm.synced_folder ".", "/vagrant", owner: "www-data", group: "www-data", type: "virtualbox"
 
   config.vm.provision "shell", path: "vagrant-bootstrap-files/bootstrap.sh"
 

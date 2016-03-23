@@ -32,6 +32,7 @@ Tools
 
 * [VirtualBox](https://www.virtualbox.org/)
 * [Vagrant](https://www.vagrantup.com/)
+* VirtualBox Guest Additions on the guest system => [vagrant-vbguest Vagrant plugin](https://github.com/dotless-de/vagrant-vbguest)
 * RAM: this virtual machine is configured to use 1 GB
 
 ## Installation
