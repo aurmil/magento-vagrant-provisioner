@@ -1,26 +1,20 @@
 #!/usr/bin/env bash
 
+# author Aurélien Millet
+# link https://github.com/aurmil/magento-vagrant-provisioner
+# license https://github.com/aurmil/magento-vagrant-provisioner/blob/master/LICENSE.md
+
 # configuration
-
-file='/vagrant/vagrant-bootstrap-files/bootstrap.cfg'
-file_secured='/tmp/bootstrap.cfg'
-
-if egrep -q -v '^#|^[^ ]*=[^;]*' "$file"; then
-  egrep '^#|^[^ ]*=[^;&]*'  "$file" > "$file_secured"
-  file="$file_secured"
-fi
-
-. "$file"
-
+TIME_ZONE=$1
 MAGENTO_VERSION='1.9.2.4'
-MAGENTO_SAMPLE_DATA_VERSION='1.9.1.0' # only version supported!
-
+MAGENTO_INSTALL_SAMPLE_DATA=$2
+MAGENTO_SAMPLE_DATA_VERSION='1.9.1.0' # only version currently supported!
 MYSQL_MAGENTO_DB_NAME='magento1'
 MYSQL_MAGENTO_USER_NAME='magento1'
 MYSQL_MAGENTO_USER_PASSWORD='magento1'
-
+MAGENTO_LOCALE=$3
+MAGENTO_CURRENCY=$4
 MAGENTO_URL='http://127.0.0.1:8080/'
-
 MAGENTO_ADMIN_PATH='admin'
 MAGENTO_ADMIN_USER_NAME='admin'
 MAGENTO_ADMIN_USER_PASSWORD='magento1'
@@ -35,18 +29,18 @@ dpkg-reconfigure -f noninteractive tzdata
 # update packages
 apt-get update -q
 
-# vim
-apt-get install -q -y vim
+# install Vim and Git
+apt-get install -q -y vim git
 
-# git
-apt-get install -q -y git
-
-# apache
+# install Apache, PHP and MySQL
 apt-get install -q -y apache2 apache2.2-common
+apt-get install -q -y php5 libapache2-mod-php5
+apt-get install -q -y php5-curl php5-gd php5-mcrypt php5-mysqlnd php-soap php5-xdebug
+apt-get install -q -y mysql-server-5.5
 a2enmod rewrite headers
 service apache2 restart
 
-# sync vagrant folder with apache root folder
+# set Vagrant folder as Apache root folder and go to it
 dir='/vagrant/www'
 if [ ! -d "$dir" ]; then
   mkdir "$dir"
@@ -55,49 +49,12 @@ if [ ! -L /var/www/html ]; then
   rm -rf /var/www/html
   ln -fs "$dir" /var/www/html
 fi
-
-# go to www
 cd "$dir"
 
-# php
-apt-get install -q -y php5 libapache2-mod-php5 php5-curl php5-gd php5-mcrypt php5-mysqlnd php-soap php5-xdebug
-service apache2 restart
-
-# composer
-php -r "readfile('https://getcomposer.org/installer');" | php
-mv composer.phar /usr/local/bin/composer
-chmod +x /usr/local/bin/composer
-
-# phpinfo script
-file='phpinfo.php'
+# Magento vhost
+file='/etc/apache2/sites-available/magento1.conf'
 if [ ! -f "$file" ]; then
-  echo '<?php phpinfo();' > "$file"
-fi
-
-# opcache gui script
-file='opcache.php'
-if [ ! -f "$file" ]; then
-  wget -nv -O "$file" https://raw.githubusercontent.com/amnuts/opcache-gui/master/index.php
-fi
-
-# mysql
-apt-get install -q -y mysql-server-5.5
-
-# adminer script
-file='adminer.php'
-if [ ! -f "$file" ]; then
-  wget -nv -O "$file" http://www.adminer.org/latest.php
-  wget -nv https://raw.githubusercontent.com/vrana/adminer/master/designs/pepa-linha/adminer.css
-fi
-
-# magento mysql user and database
-mysql -u root -e "CREATE DATABASE IF NOT EXISTS $MYSQL_MAGENTO_DB_NAME DEFAULT CHARACTER SET 'utf8' DEFAULT COLLATE 'utf8_general_ci'"
-mysql -u root -e "CREATE USER '$MYSQL_MAGENTO_USER_NAME'@'localhost' IDENTIFIED BY '$MYSQL_MAGENTO_USER_PASSWORD'"
-mysql -u root -e "GRANT ALL ON $MYSQL_MAGENTO_DB_NAME.* TO '$MYSQL_MAGENTO_USER_NAME'@'localhost'"
-mysql -u root -e "FLUSH PRIVILEGES"
-
-# magento vhost
-SITE_CONF=$(cat <<EOF
+  SITE_CONF=$(cat <<EOF
 <Directory /var/www/html>
   AllowOverride All
   Options -Indexes -MultiViews +FollowSymLinks
@@ -107,11 +64,17 @@ SITE_CONF=$(cat <<EOF
 </Directory>
 EOF
 )
-echo "$SITE_CONF" > /etc/apache2/sites-available/magento1.conf
+  echo "$SITE_CONF" > "$file"
+fi
 a2ensite magento1
 service apache2 reload
 
-# magento files
+# Magento database and user
+mysql -u root -e "CREATE DATABASE IF NOT EXISTS $MYSQL_MAGENTO_DB_NAME DEFAULT CHARACTER SET 'utf8' DEFAULT COLLATE 'utf8_general_ci'"
+mysql -u root -e "GRANT ALL ON $MYSQL_MAGENTO_DB_NAME.* TO '$MYSQL_MAGENTO_USER_NAME'@'localhost' IDENTIFIED BY '$MYSQL_MAGENTO_USER_PASSWORD'"
+mysql -u root -e "FLUSH PRIVILEGES"
+
+# Magento files
 if [ ! -f app/etc/config.xml ]; then
   dir="magento-mirror-$MAGENTO_VERSION"
   file="magento-$MAGENTO_VERSION.tar.gz"
@@ -148,8 +111,8 @@ if [ ! -f app/etc/config.xml ]; then
 
     # if file does not exist, search it elsewhere or download it
     if [ ! -f "$file" ]; then
-      if [ -f /vagrant/vagrant-bootstrap-files/"$file" ]; then
-        cp /vagrant/vagrant-bootstrap-files/"$file" .
+      if [ -f /vagrant/"$file" ]; then
+        cp /vagrant/"$file" .
       else
         wget -nv -O "$file" "https://raw.githubusercontent.com/Vinai/compressed-magento-sample-data/$MAGENTO_SAMPLE_DATA_VERSION/compressed-$dir.tgz"
       fi
@@ -173,7 +136,7 @@ fi
 chmod -R o+w media var
 chmod o+w var var/.htaccess app/etc
 
-# magento install
+# Magento install
 if [ ! -f app/etc/local.xml ]; then
   /usr/bin/php -f install.php -- \
   --license_agreement_accepted 'yes' \
@@ -184,9 +147,31 @@ if [ ! -f app/etc/local.xml ]; then
   --admin_firstname 'Store' --admin_lastname 'Owner' --admin_email 'admin@example.com' \
   --admin_username "$MAGENTO_ADMIN_USER_NAME" --admin_password "$MAGENTO_ADMIN_USER_PASSWORD"
 fi
-
-# magento re-index
 /usr/bin/php -f shell/indexer.php reindexall
+
+# Composer
+php -r "readfile('https://getcomposer.org/installer');" | php
+mv composer.phar /usr/local/bin/composer
+chmod +x /usr/local/bin/composer
+
+# phpinfo script
+file='phpinfo.php'
+if [ ! -f "$file" ]; then
+  echo '<?php phpinfo();' > "$file"
+fi
+
+# OpCache gui script
+file='opcache.php'
+if [ ! -f "$file" ]; then
+  wget -nv -O "$file" https://raw.githubusercontent.com/amnuts/opcache-gui/master/index.php
+fi
+
+# Adminer script
+file='adminer.php'
+if [ ! -f "$file" ]; then
+  wget -nv -O "$file" http://www.adminer.org/latest.php
+  wget -nv https://raw.githubusercontent.com/vrana/adminer/master/designs/pepa-linha/adminer.css
+fi
 
 # modman
 bash < <(wget -nv --no-check-certificate -O - https://raw.github.com/colinmollenhour/modman/master/modman-installer)

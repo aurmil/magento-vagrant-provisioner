@@ -6,7 +6,7 @@ Development environment for Magento, automatically configured and ready to use.
 
 LAMP
 
-* Debian 8 (jessie), 64-bit
+* Debian 8 (Jessie), 64-bit
 * Apache 2.4 (with mod_rewrite)
 * MySQL 5.5
 * PHP 5.6
@@ -42,7 +42,7 @@ Tools
 
 __Note on sample data:__
 
-If you want to install the sample data, you can speed up the environment installation (first `vagrant up`) by downloading on your own the 430 MB archive in .tar.gz format from [Magento website](https://www.magentocommerce.com/download) then just put `magento-sample-data-1.x.y.z.tar.gz` file in the `vagrant-bootstrap-files` folder.
+If you want to install the sample data, you can speed up the environment installation (first `vagrant up`) by [downloading on your own the 66 MB archive](https://raw.githubusercontent.com/Vinai/compressed-magento-sample-data/1.9.1.0/compressed-magento-sample-data-1.9.1.0.tgz) then just rename the file to `magento-sample-data-1.9.1.0.tar.gz` and put it into your project's folder.
 
 ## Usage
 
@@ -59,9 +59,13 @@ Application files are located in `your-project-folder/www`, you can manage them 
 
 ## Customizable configuration
 
-Some variables are located in a dedicated file `vagrant-bootstrap-files/bootstrap.cfg` so they can be easily changed:
+Some variables are located at the top of Vagrantfile so they can be easily changed:
 
 * System and Magento time zone (default = Europe/Paris)
 * Install Magento sample data or not (default = yes)
 * Magento locale (default = English)
 * Magento currency (default = Euro)
+
+## License
+
+The MIT License (MIT). Please see [License File](https://github.com/aurmil/magento-vagrant-provisioner/blob/master/LICENSE.md) for more information.
