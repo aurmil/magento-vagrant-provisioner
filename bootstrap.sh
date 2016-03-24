@@ -61,6 +61,7 @@ if [ ! -f "$file" ]; then
   AddDefaultCharset utf-8
   SetEnv MAGE_IS_DEVELOPER_MODE "true"
   php_flag display_errors On
+  EnableSendfile Off
 </Directory>
 EOF
 )
