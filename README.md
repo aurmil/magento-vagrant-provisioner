@@ -16,7 +16,6 @@ Magento
 * Magento CE 1.9.2.4 (from [OpenMage GitHub repo](https://github.com/OpenMage/magento-mirror) as Magento official website requires user to be logged in to download the archive)
 * Magento Sample Data 1.9.1.0 (optional ; from [Vinai compressed versions GitHub repo](https://github.com/Vinai/compressed-magento-sample-data) as Magento official website requires user to be logged in to download the archive ; with [French](http://www.magentocommerce.com/magento-connect/french-france-language-pack-for-magento-traduction-francaise.html) and [German](http://www.magentocommerce.com/magento-connect/locale-mage-community-de-de.html) language packs)
 * [modman](https://github.com/colinmollenhour/modman)
-* [modgit](https://github.com/jreinke/modgit)
 * [netz98 magerun CLI tools](https://github.com/netz98/n98-magerun)
 
 Tools

@@ -161,7 +161,7 @@ if [ ! -f "$file" ]; then
   echo '<?php phpinfo();' > "$file"
 fi
 
-# OpCache gui script
+# OPcache gui script
 file='opcache.php'
 if [ ! -f "$file" ]; then
   wget -nv -O "$file" https://raw.githubusercontent.com/amnuts/opcache-gui/master/index.php
@@ -180,14 +180,6 @@ mv /root/bin/modman /usr/local/bin/modman
 chmod +x /usr/local/bin/modman
 if [ ! -d .modman ]; then
   modman init
-fi
-
-# modgit
-wget -nv -O modgit https://raw.github.com/jreinke/modgit/master/modgit
-mv modgit /usr/local/bin/modgit
-chmod +x /usr/local/bin/modgit
-if [ ! -d .modgit ]; then
-  modgit init
 fi
 
 # netz98 magerun CLI tools
