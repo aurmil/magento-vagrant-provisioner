@@ -13,8 +13,8 @@ LAMP
 
 Magento
 
-* Magento CE 1.9.2.4 (from [OpenMage GitHub repo](https://github.com/OpenMage/magento-mirror) as Magento official website requires user to be logged in to download the archive)
-* Magento Sample Data 1.9.1.0 (optional ; from [Vinai compressed versions GitHub repo](https://github.com/Vinai/compressed-magento-sample-data) as Magento official website requires user to be logged in to download the archive ; with [French](http://www.magentocommerce.com/magento-connect/french-france-language-pack-for-magento-traduction-francaise.html) and [German](http://www.magentocommerce.com/magento-connect/locale-mage-community-de-de.html) language packs)
+* Magento CE 1.9.3.6 (from [OpenMage GitHub repo](https://github.com/OpenMage/magento-mirror) as Magento official website requires user to be logged in to download the archive)
+* Magento Sample Data 1.9.2.4 (optional ; from [my compressed sample data GitHub repo](https://github.com/aurmil/magento-compressed-sample-data) as Magento official website requires user to be logged in to download the archive ; with [French](http://www.magentocommerce.com/magento-connect/french-france-language-pack-for-magento-traduction-francaise.html) and [German](http://www.magentocommerce.com/magento-connect/locale-mage-community-de-de.html) language packs)
 * [modman](https://github.com/colinmollenhour/modman)
 * [netz98 magerun CLI tools](https://github.com/netz98/n98-magerun)
 
@@ -38,10 +38,6 @@ Tools
 
 * [Download](https://github.com/aurmil/magento-vagrant-provisioner/archive/master.zip) or clone this repository into your project's folder
 * Run `vagrant up` in this folder
-
-__Note on sample data:__
-
-If you want to install the sample data, you can speed up the environment installation (first `vagrant up`) by [downloading on your own the 66 MB archive](https://raw.githubusercontent.com/Vinai/compressed-magento-sample-data/1.9.1.0/compressed-magento-sample-data-1.9.1.0.tgz) then just rename the file to `magento-sample-data-1.9.1.0.tar.gz` and put it into your project's folder.
 
 ## Usage
 

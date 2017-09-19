@@ -6,9 +6,9 @@
 
 # configuration
 TIME_ZONE=$1
-MAGENTO_VERSION='1.9.2.4'
+MAGENTO_VERSION='1.9.3.6'
 MAGENTO_INSTALL_SAMPLE_DATA=$2
-MAGENTO_SAMPLE_DATA_VERSION='1.9.1.0' # only version currently supported!
+MAGENTO_SAMPLE_DATA_VERSION='1.9.2.4'
 MYSQL_MAGENTO_DB_NAME='magento1'
 MYSQL_MAGENTO_USER_NAME='magento1'
 MYSQL_MAGENTO_USER_PASSWORD='magento1'
@@ -110,13 +110,9 @@ if [ ! -f app/etc/config.xml ]; then
       rm -rf "$dir"
     fi
 
-    # if file does not exist, search it elsewhere or download it
+    # if file does not exist, download it
     if [ ! -f "$file" ]; then
-      if [ -f /vagrant/"$file" ]; then
-        cp /vagrant/"$file" .
-      else
-        wget -nv -O "$file" "https://raw.githubusercontent.com/Vinai/compressed-magento-sample-data/$MAGENTO_SAMPLE_DATA_VERSION/compressed-$dir.tgz"
-      fi
+      wget -nv "https://raw.githubusercontent.com/aurmil/magento-compressed-sample-data/master/$MAGENTO_SAMPLE_DATA_VERSION/$file"
     fi
 
     # if file exists, extract content and install sample data
