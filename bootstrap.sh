@@ -182,3 +182,10 @@ fi
 wget -nv https://files.magerun.net/n98-magerun.phar
 chmod +x ./n98-magerun.phar
 mv ./n98-magerun.phar /usr/local/bin/
+
+# hide admin notifications
+n98-magerun.phar admin:notifications
+
+# enable form key validation on checkout
+n98-magerun.phar config:set admin/security/validate_formkey_checkout 1
+n98-magerun.phar cache:clean config
