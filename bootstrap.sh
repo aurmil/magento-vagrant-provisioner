@@ -179,6 +179,6 @@ if [ ! -d .modman ]; then
 fi
 
 # netz98 magerun CLI tools
-wget -nv --no-check-certificate https://raw.github.com/netz98/n98-magerun/master/n98-magerun.phar
-mv n98-magerun.phar /usr/local/bin/
-chmod +x /usr/local/bin/n98-magerun.phar
+wget -nv https://files.magerun.net/n98-magerun.phar
+chmod +x ./n98-magerun.phar
+mv ./n98-magerun.phar /usr/local/bin/
