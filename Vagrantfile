@@ -7,7 +7,11 @@
 
 # configuration
 time_zone = "Europe/Paris"
+# must be available on https://github.com/OpenMage/magento-mirror
+magento_version = "1.9.3.6"
 magento_install_sample_data = "true"
+# must be available on https://github.com/aurmil/magento-compressed-sample-data
+magento_sample_data_version = "1.9.2.4"
 magento_locale = "en_US"
 magento_currency = "EUR"
 
@@ -29,6 +33,6 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision "shell" do |s|
     s.path = "bootstrap.sh"
-    s.args = [time_zone, magento_install_sample_data, magento_locale, magento_currency]
+    s.args = [time_zone, magento_version, magento_install_sample_data, magento_sample_data_version, magento_locale, magento_currency]
   end
 end
