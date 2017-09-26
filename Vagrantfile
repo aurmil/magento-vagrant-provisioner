@@ -25,8 +25,17 @@ Vagrant.configure("2") do |config|
 
   config.vm.provider "virtualbox" do |vb|
     vb.name = "vagrant_magento1"
+
+    # system
     vb.memory = 1024
+    vb.cpus = 2
+
+    # better time sync host / guest
+    # https://stackoverflow.com/questions/19490652/how-to-sync-time-on-host-wake-up-within-virtualbox#19492466
     vb.customize ["guestproperty", "set", :id, "/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold", 10000]
+
+    # better networking performance
+    # https://serverfault.com/questions/495914/vagrant-slow-internet-connection-in-guest/595010#595010
     vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
     vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
   end
