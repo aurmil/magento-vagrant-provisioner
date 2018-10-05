@@ -8,7 +8,7 @@
 # configuration
 time_zone = "Europe/Paris"
 # must be available on https://github.com/OpenMage/magento-mirror
-magento_version = "1.9.3.9"
+magento_version = "1.9.3.10"
 magento_install_sample_data = "true"
 # must be available on https://github.com/aurmil/magento-compressed-sample-data
 magento_sample_data_version = "1.9.2.4"

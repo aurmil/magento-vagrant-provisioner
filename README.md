@@ -13,7 +13,7 @@ LAMP
 
 Magento
 
-* Magento Open Source 1.9.3.8 (from [OpenMage GitHub repo](https://github.com/OpenMage/magento-mirror) as Magento official website requires user to be logged in to download the archive)
+* Magento Open Source 1.9.3.10 (from [OpenMage GitHub repo](https://github.com/OpenMage/magento-mirror) as Magento official website requires user to be logged in to download the archive)
 * Magento Sample Data 1.9.2.4 (optional ; from [my compressed sample data GitHub repo](https://github.com/aurmil/magento-compressed-sample-data) as Magento official website requires user to be logged in to download the archive ; with [French](http://www.magentocommerce.com/magento-connect/french-france-language-pack-for-magento-traduction-francaise.html) and [German](http://www.magentocommerce.com/magento-connect/locale-mage-community-de-de.html) language packs)
 * [modman](https://github.com/colinmollenhour/modman)
 * [netz98 magerun CLI tools](https://github.com/netz98/n98-magerun)
